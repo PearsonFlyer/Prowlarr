@@ -22,6 +22,7 @@ namespace NzbDrone.Core.Indexers.Cardigann
         public IDictionary<string, string> Cookies { get; set; }
         protected HttpResponse landingResult;
         protected IHtmlDocument landingResultDocument;
+        protected override string SiteLink => Settings?.BaseUrl ?? _definition.Links.First();
 
         public CardigannRequestGenerator(IConfigService configService,
                                          CardigannDefinition definition,
@@ -189,7 +190,7 @@ namespace NzbDrone.Core.Indexers.Cardigann
                     requestBuilder.AddFormParameter(pair.Key, pair.Value);
                 }
 
-                requestBuilder.Headers.Add("Referer", SiteLink);
+                requestBuilder.Headers.Add("Referer", Settings.BaseUrl);
 
                 var response = await HttpClient.ExecuteAsync(requestBuilder.Build());
 
@@ -391,7 +392,7 @@ namespace NzbDrone.Core.Indexers.Cardigann
                         AllowAutoRedirect = true
                     };
 
-                    requestBuilder.Headers.Add("Referer", SiteLink);
+                    requestBuilder.Headers.Add("Referer", Settings.BaseUrl);
 
                     requestBuilder.SetCookies(Cookies);
 
@@ -461,7 +462,7 @@ namespace NzbDrone.Core.Indexers.Cardigann
                     SuppressHttpError = true
                 };
 
-                requestBuilder.Headers.Add("Referer", SiteLink);
+                requestBuilder.Headers.Add("Referer", Settings.BaseUrl);
 
                 var response = await HttpClient.ExecuteAsync(requestBuilder.Build());
 
@@ -485,7 +486,7 @@ namespace NzbDrone.Core.Indexers.Cardigann
                     SuppressHttpError = true
                 };
 
-                requestBuilder.Headers.Add("Referer", SiteLink);
+                requestBuilder.Headers.Add("Referer", Settings.BaseUrl);
 
                 var response = await HttpClient.ExecuteAsync(requestBuilder.Build());
 
@@ -557,7 +558,7 @@ namespace NzbDrone.Core.Indexers.Cardigann
                 Method = HttpMethod.GET
             };
 
-            requestBuilder.Headers.Add("Referer", SiteLink);
+            requestBuilder.Headers.Add("Referer", Settings.BaseUrl);
 
             if (Cookies != null)
             {
@@ -633,7 +634,7 @@ namespace NzbDrone.Core.Indexers.Cardigann
 
         protected string GetRedirectDomainHint(string requestUrl, string redirectUrl)
         {
-            if (requestUrl.StartsWith(SiteLink) && !redirectUrl.StartsWith(SiteLink))
+            if (requestUrl.StartsWith(Settings.BaseUrl) && !redirectUrl.StartsWith(Settings.BaseUrl))
             {
                 var uri = new HttpUri(redirectUrl);
                 return uri.Scheme + "://" + uri.Host + "/";

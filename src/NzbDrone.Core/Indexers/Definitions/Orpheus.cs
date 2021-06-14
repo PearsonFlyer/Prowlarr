@@ -10,7 +10,8 @@ namespace NzbDrone.Core.Indexers.Definitions
     public class Orpheus : Gazelle.Gazelle
     {
         public override string Name => "Orpheus";
-        public override string BaseUrl => "https://orpheus.network/";
+        public override string[] IndexerUrls => new string[] { "https://orpheus.network/" };
+        public override string Description => "";
         public override IndexerPrivacy Privacy => IndexerPrivacy.Private;
 
         public Orpheus(IHttpClient httpClient, IEventAggregator eventAggregator, IIndexerStatusService indexerStatusService, IConfigService configService, Logger logger)
@@ -53,20 +54,20 @@ namespace NzbDrone.Core.Indexers.Definitions
 
         public override IParseIndexerResponse GetParser()
         {
-            return new OrpheusParser(Settings, Capabilities, BaseUrl);
+            return new OrpheusParser(Settings, Capabilities);
         }
     }
 
     public class OrpheusParser : GazelleParser
     {
-        public OrpheusParser(GazelleSettings settings, IndexerCapabilities capabilities, string baseUrl)
-            : base(settings, capabilities, baseUrl)
+        public OrpheusParser(GazelleSettings settings, IndexerCapabilities capabilities)
+            : base(settings, capabilities)
         {
         }
 
         protected override string GetDownloadUrl(int torrentId)
         {
-            var url = new HttpUri(_baseUrl)
+            var url = new HttpUri(_settings.BaseUrl)
                 .CombinePath("/ajax.php")
                 .AddQueryParam("action", "download")
                 .AddQueryParam("useToken", _settings.UseFreeleechToken ? "1" : "0")
